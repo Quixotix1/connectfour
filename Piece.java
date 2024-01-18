@@ -1,3 +1,5 @@
+package com.mycompany.connect4
+
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
