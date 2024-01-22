@@ -53,14 +53,21 @@ public class Grid {
         return !(grid[x][y] == null);
     }
     
-    public void placePiece(int x, int y) {
-        if (grid[x][y] == null){
-            grid[x][y] = new Piece(x * ); 
-            drawPieceList.add(p);
-        } else {
+    public void placePiece(int x, boolean isRed) {
+        boolean spaceFound = false;
+        int y = -1;
+        for (int i = 0; i < height; i++) {
+            if (grid[x][i] == null) {
+                y = i;
+                spaceFound = true;
+                break;
+            }
+        }
+        if (!spaceFound) {
             Error OverlapError = new Error("Overlapping piece");
             throw OverlapError;
-        }
+        } else grid[x][y] = new Piece(x * spaceWidth + offset + 25, y * spaceHeight + 25, isRed); //25 is the current radius, could use variable to replace it
+        
     }
     
     public boolean checkConnect4(int x, int y, Piece p) {
