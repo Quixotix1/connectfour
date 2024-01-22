@@ -28,92 +28,62 @@ public class Highlight extends Connect4{
     private static double[] mouseLocation;//x, y
     private double[] pieceLocation;//x, y
     private int radius;
-    private int width;
-    private int height;
-    //create a circle
+    private static int width;
+    private static int height;
+    private ArrayList<Circle> circles = new ArrayList<>();
+    private Group group;
 
-    public Highlight(boolean col, int rad, int w, int h){
+    public Highlight(boolean col, int rad, int w, int h, Group g){
         colour = col;
         radius = rad;
         width = w;
         height = h;
-        //radius: 50
-        //amount: 42
+        group = g;
     }
-    //getmousepos
-    public void ifDrawGhostPiece(int[] amntOfPieces){
+    
+    //call getmousepos first
+    public void ifDrawGhostPiece(){
         //check which column the mouse is in
         //draw a ghost piece in the correct location
-        int column;
-        int row;
-        for (int i = 1; i < 8; i++){
+  
+        int column = 0;
+        int row = 0;
+        for (int i = 1; i < 8; i++){//check which column
             if (width/7*i > mouseLocation[0] && mouseLocation[0] > width/7*i-1){
                 column = i;
+                break;
             }
         }
-        for (int i = 1; i < 7; i++){
+        for (int i = 1; i < 7; i++){//check which row
             if (height/6*i > mouseLocation[1] && mouseLocation[1] > height/6*i-1){
                 row = i;
+                break;
             }
         }
+        //draw piece at those coordinates
+        Circle ghostPiece = new Circle();
         
+        ghostPiece.setCenterX(column);
+        ghostPiece.setCenterY(row);
+        ghostPiece.setRadius(radius);
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+        if(colour){//pick colour
+            ghostPiece.setFill(Color.RED);
+        }
+        else{
+            ghostPiece.setFill(Color.YELLOW);
+        }
+        setColour();
+        ghostPiece.setOpacity(0.5);
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
     public void setColour(){
-        
+        colour = !colour;
     }
     
     //check if the mouse is withing the bounds of the window
-    public static boolean checkBoundaries(int[] coords, int x, int y){//done
-        return coords[0] > 0 && coords[0] < x && coords[1] > 0 && coords[1] < y; 
-    }
-    
-    public void shinyVictory(ArrayList<ArrayList<Integer>> coords){
-        
+    public static boolean checkBoundaries(int[] coords){//done
+        return coords[0] > 0 && coords[0] < width && coords[1] > 0 && coords[1] < height; 
     }
     
     public static void getMousePos(){//done...?
@@ -126,16 +96,9 @@ public class Highlight extends Connect4{
         });
     }
     
-    
-    public static boolean checkVisible(int[] coordsToCheck, int width, int height){
+    public static boolean checkVisible(int[] coordsToCheck){//check if 
         getMousePos();
-        return checkBoundaries(coordsToCheck, width, height);
+        return checkBoundaries(coordsToCheck);
     }
-    
-    public static boolean isInColumn(){
-        
-    }
-
-    
+ 
 }
-
