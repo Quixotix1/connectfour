@@ -82,6 +82,16 @@ public class Highlight{
     public void setColour(){
         colour = !colour;
     }
+
+    /**
+     * @param pos the position of tiles that create the four-in-a-row.
+     * @author josh
+     */
+    public void addWinHighlight(ArrayList<Pair<Integer, Integer>> pos) {
+        pos.forEach((c) -> {
+            Circle circle = new Circle(55, grid.getPiece(c.getKey(), c.getValue()).getIsRed() ? Color.PINK : Color.ORANGE);
+        });
+    }
     
     //check if the mouse is withing the bounds of the window
     public static boolean checkBoundaries(int[] coords){//done
