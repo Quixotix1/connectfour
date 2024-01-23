@@ -90,6 +90,8 @@ public class Highlight{
     public void addWinHighlight(ArrayList<Pair<Integer, Integer>> pos) {
         pos.forEach((c) -> {
             Circle circle = new Circle(55, grid.getPiece(c.getKey(), c.getValue()).getIsRed() ? Color.PINK : Color.ORANGE);
+            circle.setCenterX(c.getKey());
+            circle.setCenterY(c.getValue());
         });
     }
     
