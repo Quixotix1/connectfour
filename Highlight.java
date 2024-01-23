@@ -19,6 +19,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.*;
 import javafx.scene.layout.Pane;
 import java.util.ArrayList;
+import javafx.util.Pair;
 /**
  *
  * @author kate8210
@@ -32,22 +33,25 @@ public class Highlight{
     private static int width;
     private static int height;
     private ArrayList<Circle> circles = new ArrayList<>();
-    private Group group;
+    private Circle ghostPiece = new Circle();
+    private boolean isThereAPiece = false;
 
-    public Highlight(boolean col, int rad, int w, int h, Group g, Grid gr){
+    public Highlight(boolean col, int rad, int w, int h, Grid gr){
         colour = col;
         radius = rad;
         width = w;
         height = h;
-        group = g;
         grid = gr;
     }
     
     //call getmousepos first
-    public void ifDrawGhostPiece(){
+    public Circle ifDrawGhostPiece(Group group){
         //check which column the mouse is in
         //draw a ghost piece in the correct location
-  
+        if(isThereAPiece){
+            group.getChildren().remove(ghostPiece);
+            isThereAPiece = false;
+        }
         int column = 0;
         int row = 0;
         for (int i = 1; i < 8; i++){//check which column
@@ -63,8 +67,6 @@ public class Highlight{
             }
         }
         //draw piece at those coordinates
-        Circle ghostPiece = new Circle();
-        
         ghostPiece.setCenterX(column);
         ghostPiece.setCenterY(row);
         ghostPiece.setRadius(radius);
@@ -77,13 +79,18 @@ public class Highlight{
         }
         setColour();
         ghostPiece.setOpacity(0.5);
+        
+        group.getChildren().add(ghostPiece);
+        isThereAPiece = true;
+        
+        return ghostPiece;
     }
 
     public void setColour(){
         colour = !colour;
     }
-
-    /**
+    
+     /**
      * @param pos the position of tiles that create the four-in-a-row.
      * @author josh
      */
@@ -100,7 +107,7 @@ public class Highlight{
         return coords[0] > 0 && coords[0] < width && coords[1] > 0 && coords[1] < height; 
     }
     
-    public static void getMousePos(){//done...?
+    public double[] getMousePos(){//done...?
         Pane root = new Pane();
         root.setOnMouseMoved(new EventHandler<MouseEvent>(){
             public void handle(MouseEvent event){
@@ -108,9 +115,11 @@ public class Highlight{
                 mouseLocation[1] = event.getY();
             }
         });
+        
+        return mouseLocation;
     }
     
-    public static boolean checkVisible(int[] coordsToCheck){//check if 
+    public boolean checkVisible(int[] coordsToCheck){//check if 
         getMousePos();
         return checkBoundaries(coordsToCheck);
     }
