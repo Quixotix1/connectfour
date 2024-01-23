@@ -23,7 +23,7 @@ import java.util.ArrayList;
  *
  * @author kate8210
  */
-public class Highlight extends Connect4{
+public class Highlight{
     private boolean colour;
     private static double[] mouseLocation;//x, y
     private double[] pieceLocation;//x, y
