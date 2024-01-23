@@ -24,6 +24,7 @@ import java.util.ArrayList;
  * @author kate8210
  */
 public class Highlight{
+    private Grid grid;
     private boolean colour;
     private static double[] mouseLocation;//x, y
     private double[] pieceLocation;//x, y
@@ -33,12 +34,13 @@ public class Highlight{
     private ArrayList<Circle> circles = new ArrayList<>();
     private Group group;
 
-    public Highlight(boolean col, int rad, int w, int h, Group g){
+    public Highlight(boolean col, int rad, int w, int h, Group g, Grid gr){
         colour = col;
         radius = rad;
         width = w;
         height = h;
         group = g;
+        grid = gr;
     }
     
     //call getmousepos first
