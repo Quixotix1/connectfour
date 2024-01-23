@@ -27,7 +27,7 @@ import javafx.util.Pair;
 public class Highlight{
     private Grid grid;
     private boolean colour;
-    private static double[] mouseLocation;//x, y
+    private static double[] mouseLocation = new double[2];//x, y
     private double[] pieceLocation;//x, y
     private int radius;
     private static int width;
@@ -80,7 +80,6 @@ public class Highlight{
         setColour();
         ghostPiece.setOpacity(0.5);
         
-        group.getChildren().add(ghostPiece);
         isThereAPiece = true;
         
         return ghostPiece;
@@ -119,9 +118,18 @@ public class Highlight{
         return mouseLocation;
     }
     
+    
     public boolean checkVisible(int[] coordsToCheck){//check if 
         getMousePos();
         return checkBoundaries(coordsToCheck);
+    }
+    
+     public Circle draw(){
+        Circle ghostPiece = new Circle();
+        ghostPiece.setCenterX(70);
+        ghostPiece.setCenterY(70);
+        ghostPiece.setRadius(100); 
+        return ghostPiece;
     }
  
 }
