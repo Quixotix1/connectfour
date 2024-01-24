@@ -60,12 +60,12 @@ public class Highlight{
         
         for (int i = 1; i < 8; i++){//check which column
             if (width/7*i > mouseLocation[0] && mouseLocation[0] > width/7*i-1){
-                column = i;
-                row = piecesInColumn[i - 1] + 1;
+                column = width/14*i;
+                row = (piecesInColumn[i - 1] + 1)*width/12;
                 break;
             }
         }
-        //column = 2 + 3 pieces 
+        //column = 2 + 3 pieces ... row = 4
         
         //draw piece at those coordinates
         //ghostPiece.setCenterX(column);
@@ -116,14 +116,12 @@ public class Highlight{
         Pane root = new Pane();
         root.setOnMouseMoved(new EventHandler<MouseEvent>(){
             @Override public void handle(MouseEvent event){
-                //mouseLocation[0] = event.getX();
-                //mouseLocation[1] = event.getY();
-                
-                
+                mouseLocation[0] = event.getX();
+                mouseLocation[1] = event.getY();
             }
         });
-        mouseLocation[0] = 400;
-        mouseLocation[1] = 100;
+        //mouseLocation[0] = 400;
+        //mouseLocation[1] = 100;
         return mouseLocation;
     }
     
@@ -132,6 +130,5 @@ public class Highlight{
         getMousePos();
         return checkBoundaries(coordsToCheck);
     }
-
- 
+   
 }
