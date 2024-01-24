@@ -32,8 +32,8 @@ import javafx.scene.text.Font;
  */
 public class Connect4 extends Application {
     //below are some constants
-    static final int columnNumber = 7;
-    static final int rowNumber = 6;
+    static final int COLUMN_NUMBER = 7;
+    static final int ROW_NUMBER = 6;
     Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
     final double screenWidth = screenBounds.getWidth();
     final double screenHeight = screenBounds.getHeight();
@@ -47,6 +47,8 @@ public class Connect4 extends Application {
         ArrayList<Line> verticalLines = new ArrayList<>();
         ArrayList<Line> horizontalLines = new ArrayList<>();
         
+        Grid grid = new Grid(COLUMN_NUMBER, ROW_NUMBER, (screenWidth/(COLUMN_NUMBER + 4)), (screenHeight / (ROW_NUMBER + 2)), (screenWidth / COLUMN_NUMBER + 4) * 2);
+        Highlight highlight = new Highlight(true, 20, COLUMN_NUMBER, ROW_NUMBER , grid);
         //Starting group setup
         Label titleLabel = new Label("Connect 4");
         titleLabel.setFont(new Font("Arial", 350));
@@ -61,10 +63,10 @@ public class Connect4 extends Application {
         startGroup.getChildren().add(titleLabel);
         startGroup.getChildren().add(startButton);
         
-        for(int i = 0; i < columnNumber + 1; i++) //initialize lines for board
+        for(int i = 0; i < COLUMN_NUMBER + 1; i++) //initialize lines for board
         {
             verticalLines.add(new Line());
-            if (i < columnNumber) //an attempt to be more efficient with initializing the board
+            if (i < COLUMN_NUMBER) //an attempt to be more efficient with initializing the board
             {
                 horizontalLines.add(new Line());
             }   
@@ -87,6 +89,7 @@ public class Connect4 extends Application {
         startScene = new Scene(startGroup, screenWidth, screenHeight);
         startScene.setFill(Color.PINK);
         gameScene = new Scene(root, screenWidth, screenHeight);
+        gameScene.setFill(Color.LIGHTGREY);
         primaryStage.setScene(startScene);
         primaryStage.setWidth(screenWidth);
         primaryStage.setHeight(screenHeight);
@@ -104,6 +107,7 @@ public class Connect4 extends Application {
     }
 
     public static void main(String[] args) {
+        
         launch();
   
     }
@@ -112,11 +116,11 @@ public class Connect4 extends Application {
     {
         for (int i = 0; i < verticalLines.size(); i++) //vertical lines
         {
-            verticalLines.get(i).setStartX((screenWidth / (columnNumber + 2)) * (i + 1)); //change this to col and row num
-            verticalLines.get(i).setEndX((screenWidth / (columnNumber + 2)) * (i + 1)); // maybe use a common variable for these two
-            verticalLines.get(i).setStartY(screenHeight / (rowNumber + 2));
-            verticalLines.get(i).setEndY(screenHeight / (rowNumber + 2) * (rowNumber + 1));
-            verticalLines.get(i).setStrokeWidth(2.0);
+            verticalLines.get(i).setStartX((screenWidth / (COLUMN_NUMBER + 4)) * (i + 2)); //change this to col and row num
+            verticalLines.get(i).setEndX((screenWidth / (COLUMN_NUMBER + 4)) * (i + 2)); // maybe use a common variable for these two
+            verticalLines.get(i).setStartY(screenHeight / (ROW_NUMBER + 2));
+            verticalLines.get(i).setEndY(screenHeight / (ROW_NUMBER + 2) * (ROW_NUMBER + 1));
+            verticalLines.get(i).setStrokeWidth(3.0);
         }
     }
     
@@ -124,11 +128,11 @@ public class Connect4 extends Application {
     {
         for (int i = 0; i < horizontalLines.size(); i++)
         {
-            horizontalLines.get(i).setStartX(screenWidth / (columnNumber + 2));
-            horizontalLines.get(i).setEndX(screenWidth / (columnNumber + 2) * (columnNumber + 1));
-            horizontalLines.get(i).setStartY((screenHeight / (rowNumber + 2)) * (i + 1));
-            horizontalLines.get(i).setEndY((screenHeight / (rowNumber + 2)) * (i + 1));
-            horizontalLines.get(i).setStrokeWidth(2.0);
+            horizontalLines.get(i).setStartX((screenWidth / (COLUMN_NUMBER + 4)) * 2); //these numbers are all just random bs that make them allign nicely
+            horizontalLines.get(i).setEndX(screenWidth / (COLUMN_NUMBER + 4) * (9));
+            horizontalLines.get(i).setStartY((screenHeight / (ROW_NUMBER + 2)) * (i + 1));
+            horizontalLines.get(i).setEndY((screenHeight / (ROW_NUMBER + 2)) * (i + 1));
+            horizontalLines.get(i).setStrokeWidth(3.0);
         }
     }
 
