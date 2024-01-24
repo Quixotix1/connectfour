@@ -132,13 +132,6 @@ public class Highlight{
         getMousePos();
         return checkBoundaries(coordsToCheck);
     }
-    
-     public Circle draw(){
-        Circle ghostPiece = new Circle();
-        ghostPiece.setCenterX(70);
-        ghostPiece.setCenterY(70);
-        ghostPiece.setRadius(100); 
-        return ghostPiece;
-    }
+
  
 }
