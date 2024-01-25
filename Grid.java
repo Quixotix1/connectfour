@@ -13,6 +13,7 @@ import javafx.stage.Stage;
 import javafx.scene.control.Button;
 import javafx.scene.text.Text;
 import java.util.Map;
+import javafx.scene.Group;
         
 /**
  *
@@ -53,7 +54,7 @@ public class Grid {
         return !(grid[x][y] == null);
     }
     
-    public void placePiece(int x, boolean isRed) {
+    public Group placePiece(int x, boolean isRed, Group g) {
         boolean spaceFound = false;
         int y = -1;
         for (int i = 0; i < height; i++) {
@@ -66,8 +67,11 @@ public class Grid {
         if (!spaceFound) {
             Error OverlapError = new Error("Overlapping piece");
             throw OverlapError;
-        } else grid[x][y] = new Piece(x * spaceWidth + offset + 25, y * spaceHeight + 25, isRed); //25 is the current radius, could use variable to replace it
-        
+        } else {
+            grid[x][y] = new Piece(x * spaceWidth + offset + 25, y * spaceHeight + 25, isRed); //25 is the current radius, could use variable to replace it
+            g.getChildren().add(grid[x][y]);
+            return g;
+        } 
     }
     
     public boolean checkConnect4(int x, int y, Piece p) {
