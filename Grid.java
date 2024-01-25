@@ -24,17 +24,19 @@ public class Grid {
     private int height;
     private double spaceWidth;
     private double spaceHeight;
-    private double offset;
+    private double Xoffset;
+    private double Yoffset;
     private Piece[][] grid;
     private ArrayList<Pair<Integer, Integer>> connectedCoords = new ArrayList<>();
     private ArrayList<Piece> drawPieceList = new ArrayList<>();
     
-    public Grid (int w, int h, double spaceW, double spaceH, double offset) {
+    public Grid (int w, int h, double spaceW, double spaceH, double Xoffset, double Yoffset, double screenH) {
         width = w;
         height = h;
         spaceWidth = spaceW;
         spaceHeight = spaceH;
-        this.offset = offset;
+        this.Xoffset = Xoffset;
+        this.Yoffset = Yoffset;
         grid = new Piece[width][height];
     }
     
@@ -68,7 +70,7 @@ public class Grid {
             Error OverlapError = new Error("Overlapping piece");
             throw OverlapError;
         } else {
-            grid[x][y] = new Piece(x * spaceWidth + offset + 25, y * spaceHeight + 25, isRed); //25 is the current radius, could use variable to replace it
+            grid[x][y] = new Piece(x * spaceWidth + Xoffset + 25, screenH - (y * spaceHeight) - 25 - Yoffset, isRed); //25 is the current radius, could use variable to replace it
             g.getChildren().add(grid[x][y]);
             return g;
         } 
