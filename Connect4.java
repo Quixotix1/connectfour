@@ -37,17 +37,22 @@ public class Connect4 extends Application {
     Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
     final double screenWidth = screenBounds.getWidth();
     final double screenHeight = screenBounds.getHeight();
+    final double xOffset = (screenWidth / (COLUMN_NUMBER + 4)) * 2;
+    final double yOffset = (screenHeight / (ROW_NUMBER + 2));
+    final double spaceWidth = (screenWidth / (COLUMN_NUMBER + 4));
+    final double spaceHeight = (screenHeight / (ROW_NUMBER + 2));
+    Group root = new Group();
     @Override
     public void start(Stage primaryStage) {
         Scene startScene;
         Scene gameScene;
-        Group root = new Group();
+        
         Group startGroup = new Group();
         ArrayList<Highlight> ghostPieces = new ArrayList<>();
         ArrayList<Line> verticalLines = new ArrayList<>();
         ArrayList<Line> horizontalLines = new ArrayList<>();
         
-        Grid grid = new Grid(COLUMN_NUMBER, ROW_NUMBER, (screenWidth/(COLUMN_NUMBER + 4)), (screenHeight / (ROW_NUMBER + 2)), (screenWidth / COLUMN_NUMBER + 4) * 2);
+        Grid grid = new Grid(COLUMN_NUMBER, ROW_NUMBER, spaceWidth, spaceHeight, xOffset, yOffset, screenHeight);
         Highlight highlight = new Highlight(true, 20, COLUMN_NUMBER, ROW_NUMBER , grid);
         //Starting group setup
         Label titleLabel = new Label("Connect 4");
@@ -84,12 +89,27 @@ public class Connect4 extends Application {
             root.getChildren().add(horizontalLines.get(i));
         }
         
+         EventHandler<MouseEvent> eventHandler = new EventHandler<MouseEvent>() { 
+         @Override 
+         public void handle(MouseEvent e) { 
+            try
+            {
+                int index = findIndex(e.getX());
+                root = grid.placePiece(index, true, root);
+            } catch(Error OverlapError)
+            {
+                System.out.println("you're bad");
+            }
+         } 
+      };  
+        
         
         
         startScene = new Scene(startGroup, screenWidth, screenHeight);
         startScene.setFill(Color.PINK);
         gameScene = new Scene(root, screenWidth, screenHeight);
         gameScene.setFill(Color.LIGHTGREY);
+        gameScene.addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandler);
         primaryStage.setScene(startScene);
         primaryStage.setWidth(screenWidth);
         primaryStage.setHeight(screenHeight);
@@ -134,6 +154,11 @@ public class Connect4 extends Application {
             horizontalLines.get(i).setEndY((screenHeight / (ROW_NUMBER + 2)) * (i + 1));
             horizontalLines.get(i).setStrokeWidth(3.0);
         }
+    }
+    
+    private int findIndex(double mouseX)
+    {
+         return (int) ((mouseX - (screenWidth / (COLUMN_NUMBER + 4) * 2)) / (screenWidth / (COLUMN_NUMBER + 4)));
     }
 
 }
