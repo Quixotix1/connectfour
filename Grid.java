@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.mycompany.connect_4;
+package com.mycompany.connect4;
 import java.util.ArrayList;
 import javafx.util.Pair;
 import javafx.scene.paint.Color;
@@ -68,6 +68,7 @@ public class Grid {
                 break;
             }
         }
+//        System.out.println("debug " + x + " " + y);
         if (!spaceFound) {
             Error OverlapError = new Error("Overlapping piece");
             throw OverlapError;
@@ -85,7 +86,7 @@ public class Grid {
             else break;
         }
         Piece p = grid[x][y];
-        boolean pieceIsRed = true; //p.getIsRed() after or whatever method
+        boolean pieceIsRed = p.getIsRed(); //p.getIsRed() after or whatever method
         return checkRow(x, y, p, pieceIsRed) || checkColumn(x, y, p, pieceIsRed) || checkDiagUpRight(x, y, p, pieceIsRed) || checkDiagUpLeft(x, y, p, pieceIsRed);
     }
     
@@ -156,24 +157,24 @@ public class Grid {
             y2 += 1;
             
             if (connected == 4) return true;
-            if (x1 >= 0 && checkLeft) {
-                if (!(grid[x1][y1] == null)) {
+            if (x1 >= 0 && checkLeft && y1 >= 0) {
+                if (grid[x1][y1] != null) {
                     if (grid[x1][y1].getIsRed() == pieceIsRed) {
                         connected += 1;
                         connectedCoords.add(new Pair<>(x1, y1));
                     }
                     else checkLeft = false;
                 } else checkLeft = false;
-            }
-            if (x2 < width && checkRight) {
-                if (!(grid[x2][y2] == null)) {
+            } else checkLeft = false;
+            if (x2 < width && checkRight && y2 < height) {
+                if (grid[x2][y2] != null) {
                     if (grid[x2][y2].getIsRed() == pieceIsRed) {
                         connected += 1;
                         connectedCoords.add(new Pair<>(x2, y2));
                     }
                     else checkRight = false;
                 } else checkRight = false;
-            }
+            } else checkRight = false;
             if (!(checkRight || checkLeft)) break;
         }
         clearConnectedList();
@@ -191,28 +192,26 @@ public class Grid {
         while (true) {
             x1 -= 1;
             x2 += 1;
-            y1 -= 1;
-            y2 += 1;
+            y1 += 1;
+            y2 -= 1;
             
             if (connected == 4) return true;
-            if (x1 >= 0 && checkLeft) {
-                if (!(grid[x1][y1] == null)) {
+            if (x1 >= 0 && checkLeft && y1 < height) {
+                if (grid[x1][y1] != null) {
                     if (grid[x1][y1].getIsRed() == pieceIsRed) {
                         connected += 1;
                         connectedCoords.add(new Pair<>(x1, y1));
-                    }
-                    else checkLeft = false;
+                    } else checkLeft = false;
                 } else checkLeft = false;
-            }
-            if (x2 < width && checkRight) {
-                if (!(grid[x2][y2] == null)) {
+            } else checkLeft = false;
+            if (x2 < width && checkRight && y2 >= 0) {
+                if (grid[x2][y2] != null) {
                     if (grid[x2][y2].getIsRed() == pieceIsRed) {
                         connected += 1;
                         connectedCoords.add(new Pair<>(x2, y2));
-                    }
-                    else checkRight = false;
+                    } else checkRight = false;
                 } else checkRight = false;
-            }
+            } else checkRight = false;
             if (!(checkRight || checkLeft)) break;
         }
         clearConnectedList();
