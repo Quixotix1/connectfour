@@ -30,6 +30,7 @@ public class Grid {
     private Piece[][] grid;
     private ArrayList<Pair<Integer, Integer>> connectedCoords = new ArrayList<>();
     private ArrayList<Piece> drawPieceList = new ArrayList<>();
+    private int[] piecesInColumn = new int[7];
     
     public Grid (int w, int h, double spaceW, double spaceH, double Xoffset, double Yoffset, double screenH) {
         width = w;
@@ -53,7 +54,11 @@ public class Grid {
     public Piece getPiece(int x, int y) {
         return grid[x][y];
     }
-    
+        
+    public int[] getPiecesInColumn(){
+        return piecesInColumn;
+    }
+        
     public boolean isTaken(int x, int y) {
         return !(grid[x][y] == null);
     }
@@ -75,6 +80,7 @@ public class Grid {
         } else {
             grid[x][y] = new Piece(x * spaceWidth + xOffset + spaceWidth / 2, screenH - (y * spaceHeight) - yOffset - spaceHeight / 2, isRed); //25 is the current radius, could use variable to replace it
             g.getChildren().add(grid[x][y]);
+            piecesInColumn[x] += 1; //so we know how many pieces are already in each column
             return g;
         } 
     }
