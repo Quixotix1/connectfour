@@ -72,7 +72,7 @@ public class Grid {
             Error OverlapError = new Error("Overlapping piece");
             throw OverlapError;
         } else {
-            grid[x][y] = new Piece(x * spaceWidth + xOffset + 25 + spaceWidth / 2, screenH - (y * spaceHeight) - 25 - yOffset - spaceHeight / 2, isRed); //25 is the current radius, could use variable to replace it
+            grid[x][y] = new Piece(x * spaceWidth + xOffset + spaceWidth / 2, screenH - (y * spaceHeight) - yOffset - spaceHeight / 2, isRed); //25 is the current radius, could use variable to replace it
             g.getChildren().add(grid[x][y]);
             return g;
         } 
