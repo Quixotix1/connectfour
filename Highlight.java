@@ -4,20 +4,10 @@
  */
 package com.mycompany.connect4;
 
-import javafx.application.Application; 
 import javafx.scene.Group; 
 import javafx.scene.Scene; 
-import javafx.stage.Stage; 
 import javafx.scene.paint.*;
 import javafx.scene.shape.Circle;
-import static javafx.application.Application.launch;
-import javafx.event.*;
-import javafx.scene.*;
-import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.VBox;
-import javafx.stage.*;
-import javafx.scene.layout.Pane;
 import java.util.ArrayList;
 import javafx.util.Pair;
 /**
@@ -26,17 +16,15 @@ import javafx.util.Pair;
  */
 public class Highlight{
     private Grid grid;
-    private boolean colour;
     private static double[] mouseLocation = new double[2];//x, y
-    private double[] pieceLocation;//x, y
-    private int radius;
-    private static int width;
-    private static int height;
-    private ArrayList<Circle> circles = new ArrayList<>();
+    final private double radius;
+    private static double width;
+    private static double height;
+    private boolean colour;
     private Circle ghostPiece = new Circle();
     private boolean isThereAPiece = false;
 
-    public Highlight(boolean col, int rad, int w, int h, Grid gr){
+    public Highlight(boolean col,double rad, double w, double h, Grid gr){//I need the width and height of the board, not the window
         colour = col;
         radius = rad;
         width = w;
@@ -45,7 +33,7 @@ public class Highlight{
     }
     
     //call getmousepos first
-    public Circle ifDrawGhostPiece(Group group, int[] piecesInColumn){
+    public Circle drawGhostPiece( Group group, int[] piecesInColumn, double xOffset, double yOffset){
         //check which column the mouse is in
         //draw a ghost piece in the correct location
         if(isThereAPiece){
@@ -53,28 +41,25 @@ public class Highlight{
             isThereAPiece = false;
         }
         
-        int column = 0;//indicates x coor to draw circle
-        int row = 0;//indicates y coor to draw circle
+        double xCoor = 0;//indicates x coor to draw circle - based off the column its in
+        double yCoor = 0;//indicates y coor to draw circle - based off the row its in
         System.out.println(mouseLocation[0]);
         System.out.println(mouseLocation[1]);
         
         for (int i = 1; i < 8; i++){//check which column
-            if (width/7*i > mouseLocation[0] && mouseLocation[0] > width/7*i-1){
-                column = width/14*i;
-                row = (piecesInColumn[i - 1] + 1)*width/12;
-                break;
+            System.out.println("  | " + width/7*i + "?> " + mouseLocation[0]);
+            System.out.println("  | " + (width/7*(i-1)) + "?<" + mouseLocation[0]);
+            if (width/7*i + xOffset > mouseLocation[0] && mouseLocation[0] > width/7*(i-1) + xOffset){
+                xCoor = (width/7*i + xOffset - width/14); //finding the coordinates 
+                System.out.println("i = " + i);
+                yCoor = height/6 * (6 - piecesInColumn[i-1]) + height/12;
+                break; 
             }
         }
-        //column = 2 + 3 pieces ... row = 4
-        
-        //draw piece at those coordinates
-        //ghostPiece.setCenterX(column);
-        //ghostPiece.setCenterY(row);
-        //ghostPiece.setRadius(radius);
-        System.out.println(column);
-        
-        ghostPiece.setCenterX(mouseLocation[0]);
-        ghostPiece.setCenterY(mouseLocation[1]);
+    
+        //set up piece
+        ghostPiece.setCenterX(xCoor);
+        ghostPiece.setCenterY(yCoor);
         ghostPiece.setRadius(radius);
         
         if(colour){//pick colour
@@ -83,7 +68,6 @@ public class Highlight{
         else{
             ghostPiece.setFill(Color.YELLOW);
         }
-        setColour();
         ghostPiece.setOpacity(0.25);
         
         isThereAPiece = true;
@@ -91,9 +75,6 @@ public class Highlight{
         return ghostPiece;
     }
 
-    public void setColour(){
-        colour = !colour;
-    }
     
      /**
      * @param pos the position of tiles that create the four-in-a-row.
@@ -107,28 +88,22 @@ public class Highlight{
         });
     }
     
-    //check if the mouse is withing the bounds of the window
-    public static boolean checkBoundaries(int[] coords){//done
-        return coords[0] > 0 && coords[0] < width && coords[1] > 0 && coords[1] < height; 
-    }
-    
-    public double[] getMousePos(){//done...?
-        Pane root = new Pane();
-        root.setOnMouseMoved(new EventHandler<MouseEvent>(){
-            @Override public void handle(MouseEvent event){
-                mouseLocation[0] = event.getX();
-                mouseLocation[1] = event.getY();
+    public void getMousePos(Scene scene, Group group, int[] piecesInColumn,  double xOffset, double yOffset){
+        scene.setOnMouseMoved(event -> {
+            mouseLocation[0] = event.getSceneX();
+            mouseLocation[1] = event.getSceneY();
+            if(mouseLocation[0] > xOffset && mouseLocation[0] < xOffset + width && mouseLocation[1] > yOffset && mouseLocation[1] < yOffset + height){//if the mouse is on the board
+                group.getChildren().add(drawGhostPiece(group, piecesInColumn, xOffset, yOffset));
+            }
+            else{//if not, it won't print anything
+                group.getChildren().remove(ghostPiece);
             }
         });
-        //mouseLocation[0] = 400;
-        //mouseLocation[1] = 100;
-        return mouseLocation;
     }
-    
-    
-    public boolean checkVisible(int[] coordsToCheck){//check if 
-        getMousePos();
-        return checkBoundaries(coordsToCheck);
+
+    public boolean setColour(){
+        colour = !colour;
+        return colour;
     }
    
 }
