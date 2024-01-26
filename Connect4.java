@@ -41,6 +41,8 @@ public class Connect4 extends Application {
     final double yOffset = (screenHeight / (ROW_NUMBER + 2));
     final double spaceWidth = (screenWidth / (COLUMN_NUMBER + 4));
     final double spaceHeight = (screenHeight / (ROW_NUMBER + 2));
+    final double boardWidth = screenWidth - xOffset * 2;
+    final double boardHeight = screenHeight - yOffset * 2;
     boolean redTurn = true;
     Group root = new Group();
     @Override
@@ -55,7 +57,7 @@ public class Connect4 extends Application {
         
         
         Grid grid = new Grid(COLUMN_NUMBER, ROW_NUMBER, spaceWidth, spaceHeight, xOffset, yOffset, screenHeight);
-        Highlight highlight = new Highlight(true, 25, COLUMN_NUMBER, ROW_NUMBER , grid);
+        Highlight highlight = new Highlight(true, 50, boardWidth, boardHeight , grid);
         //Starting group setup
         Label titleLabel = new Label("Connect 4");
         titleLabel.setFont(new Font("Arial", 350));
@@ -91,6 +93,10 @@ public class Connect4 extends Application {
             root.getChildren().add(horizontalLines.get(i));
         }
         
+        gameScene = new Scene(root, screenWidth, screenHeight);
+        //printGhostPieces
+        highlight.getMousePos(gameScene, root, grid.getPiecesInColumn(), xOffset, yOffset);
+        
          EventHandler<MouseEvent> mouseClickHandler = new EventHandler<>() { 
          @Override 
          public void handle(MouseEvent e) {
@@ -100,7 +106,7 @@ public class Connect4 extends Application {
             {
                 root = grid.placePiece(index, redTurn, root);
                 System.out.println(grid.checkConnect4(index));
-                redTurn = !redTurn;
+                redTurn = highlight.setColour();
             } catch(Error OverlapError)
             {
                 System.out.println("That column is full.");
@@ -111,25 +117,14 @@ public class Connect4 extends Application {
             }
          }
       };  
-         
-        EventHandler<MouseEvent> mouseMovedHandler = new EventHandler<>()
-        {
-            @Override
-            public void handle(MouseEvent e)
-            {
-                //use ghost piece method
-                root.getChildren().add(highlight.ifDrawGhostPiece(root));
-            }
-        };
-        
-        
+
+       
         
         startScene = new Scene(startGroup, screenWidth, screenHeight);
         startScene.setFill(Color.PINK);
-        gameScene = new Scene(root, screenWidth, screenHeight);
         gameScene.setFill(Color.LIGHTGREY);
         gameScene.addEventFilter(MouseEvent.MOUSE_CLICKED, mouseClickHandler);
-        gameScene.setOnMouseMoved(mouseMovedHandler);
+        //gameScene.setOnMouseMoved(mouseMovedHandler); //if this is for the highlight code, I don't need it
         primaryStage.setScene(startScene);
         primaryStage.setWidth(screenWidth);
         primaryStage.setHeight(screenHeight);
