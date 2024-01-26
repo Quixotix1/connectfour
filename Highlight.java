@@ -32,7 +32,7 @@ public class Highlight{
         grid = gr;
     }
     
-    //call getmousepos first
+    //call in getMousePos
     public Circle drawGhostPiece( Group group, int[] piecesInColumn, double xOffset, double yOffset){
         //check which column the mouse is in
         //draw a ghost piece in the correct location
@@ -43,15 +43,15 @@ public class Highlight{
         
         double xCoor = 0;//indicates x coor to draw circle - based off the column its in
         double yCoor = 0;//indicates y coor to draw circle - based off the row its in
-        System.out.println(mouseLocation[0]);
-        System.out.println(mouseLocation[1]);
+        //System.out.println(mouseLocation[0]);
+        //System.out.println(mouseLocation[1]);
         
         for (int i = 1; i < 8; i++){//check which column
-            System.out.println("  | " + width/7*i + "?> " + mouseLocation[0]);
-            System.out.println("  | " + (width/7*(i-1)) + "?<" + mouseLocation[0]);
+            //System.out.println("  | " + width/7*i + "?> " + mouseLocation[0]);
+            //System.out.println("  | " + (width/7*(i-1)) + "?<" + mouseLocation[0]);
             if (width/7*i + xOffset > mouseLocation[0] && mouseLocation[0] > width/7*(i-1) + xOffset){
                 xCoor = (width/7*i + xOffset - width/14); //finding the coordinates 
-                System.out.println("i = " + i);
+                //System.out.println("i = " + i);
                 yCoor = height/6 * (6 - piecesInColumn[i-1]) + height/12;
                 break; 
             }
