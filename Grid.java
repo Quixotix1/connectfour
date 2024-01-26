@@ -78,7 +78,13 @@ public class Grid {
         } 
     }
     
-    public boolean checkConnect4(int x, int y, Piece p) {
+    public boolean checkConnect4(int x) {
+        int y = 0;
+        for (int i = 0; i < height; i++) {
+            if (grid[x][i] != null) y = i;
+            else break;
+        }
+        Piece p = grid[x][y];
         boolean pieceIsRed = true; //p.getIsRed() after or whatever method
         return checkRow(x, y, p, pieceIsRed) || checkColumn(x, y, p, pieceIsRed) || checkDiagUpRight(x, y, p, pieceIsRed) || checkDiagUpLeft(x, y, p, pieceIsRed);
     }
