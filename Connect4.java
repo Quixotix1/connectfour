@@ -41,6 +41,7 @@ public class Connect4 extends Application {
     final double yOffset = (screenHeight / (ROW_NUMBER + 2));
     final double spaceWidth = (screenWidth / (COLUMN_NUMBER + 4));
     final double spaceHeight = (screenHeight / (ROW_NUMBER + 2));
+    boolean redTurn = true;
     Group root = new Group();
     @Override
     public void start(Stage primaryStage) {
@@ -51,6 +52,7 @@ public class Connect4 extends Application {
         ArrayList<Highlight> ghostPieces = new ArrayList<>();
         ArrayList<Line> verticalLines = new ArrayList<>();
         ArrayList<Line> horizontalLines = new ArrayList<>();
+        
         
         Grid grid = new Grid(COLUMN_NUMBER, ROW_NUMBER, spaceWidth, spaceHeight, xOffset, yOffset, screenHeight);
         Highlight highlight = new Highlight(true, 20, COLUMN_NUMBER, ROW_NUMBER , grid);
@@ -89,19 +91,35 @@ public class Connect4 extends Application {
             root.getChildren().add(horizontalLines.get(i));
         }
         
-         EventHandler<MouseEvent> eventHandler = new EventHandler<MouseEvent>() { 
+         EventHandler<MouseEvent> mouseClickHandler = new EventHandler<>() { 
          @Override 
-         public void handle(MouseEvent e) { 
+         public void handle(MouseEvent e) {
             try
             {
                 int index = findIndex(e.getX());
-                root = grid.placePiece(index, true, root);
+                root = grid.placePiece(index, redTurn, root);
+                System.out.println(grid.checkConnect4(index));
+                redTurn = !redTurn;
             } catch(Error OverlapError)
             {
-                System.out.println("you're bad");
+                System.out.println("That column is full.");
             }
-         } 
+            catch(Exception ArraryIndexOutOfBoundsException)
+            {
+                System.out.println("That move is out of bounds!");
+            }
+         }
       };  
+         
+        EventHandler<MouseEvent> mouseMovedHandler = new EventHandler<>()
+        {
+            @Override
+            public void handle(MouseEvent e)
+            {
+                //use ghost piece method
+                //System.out.println("hi Terrence");
+            }
+        };
         
         
         
@@ -109,7 +127,8 @@ public class Connect4 extends Application {
         startScene.setFill(Color.PINK);
         gameScene = new Scene(root, screenWidth, screenHeight);
         gameScene.setFill(Color.LIGHTGREY);
-        gameScene.addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandler);
+        gameScene.addEventFilter(MouseEvent.MOUSE_CLICKED, mouseClickHandler);
+        gameScene.setOnMouseMoved(mouseMovedHandler);
         primaryStage.setScene(startScene);
         primaryStage.setWidth(screenWidth);
         primaryStage.setHeight(screenHeight);
