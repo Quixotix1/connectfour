@@ -49,13 +49,13 @@ public class Connect4 extends Application {
         Scene gameScene;
         
         Group startGroup = new Group();
-        ArrayList<Highlight> ghostPieces = new ArrayList<>();
+       // ArrayList<Highlight> ghostPieces = new ArrayList<>();
         ArrayList<Line> verticalLines = new ArrayList<>();
         ArrayList<Line> horizontalLines = new ArrayList<>();
         
         
         Grid grid = new Grid(COLUMN_NUMBER, ROW_NUMBER, spaceWidth, spaceHeight, xOffset, yOffset, screenHeight);
-        Highlight highlight = new Highlight(true, 20, COLUMN_NUMBER, ROW_NUMBER , grid);
+        Highlight highlight = new Highlight(true, 25, COLUMN_NUMBER, ROW_NUMBER , grid);
         //Starting group setup
         Label titleLabel = new Label("Connect 4");
         titleLabel.setFont(new Font("Arial", 350));
@@ -94,9 +94,10 @@ public class Connect4 extends Application {
          EventHandler<MouseEvent> mouseClickHandler = new EventHandler<>() { 
          @Override 
          public void handle(MouseEvent e) {
+            int index = findIndex(e.getX());
+            System.out.println(index);
             try
             {
-                int index = findIndex(e.getX());
                 root = grid.placePiece(index, redTurn, root);
                 System.out.println(grid.checkConnect4(index));
                 redTurn = !redTurn;
@@ -117,7 +118,7 @@ public class Connect4 extends Application {
             public void handle(MouseEvent e)
             {
                 //use ghost piece method
-                //System.out.println("hi Terrence");
+                root.getChildren().add(highlight.ifDrawGhostPiece(root));
             }
         };
         
