@@ -30,7 +30,7 @@ public class Grid {
     private Piece[][] grid;
     private ArrayList<Pair<Integer, Integer>> connectedCoords = new ArrayList<>();
     private ArrayList<Piece> drawPieceList = new ArrayList<>();
-    private int[] piecesInColumn = new int[7];
+    private int[] piecesInColumn;
     
     public Grid (int w, int h, double spaceW, double spaceH, double Xoffset, double Yoffset, double screenH) {
         width = w;
@@ -41,6 +41,7 @@ public class Grid {
         this.yOffset = Yoffset;
         this.screenH = screenH;
         grid = new Piece[width][height];
+        piecesInColumn = new int[width];
     }
     
     public int getHeight() {
@@ -65,32 +66,21 @@ public class Grid {
     
     public Group placePiece(int x, boolean isRed, Group g) {
         boolean spaceFound = false;
-        int y = -1;
-        for (int i = 0; i < height; i++) {
-            if (grid[x][i] == null) {
-                y = i;
-                spaceFound = true;
-                break;
-            }
-        }
-//        System.out.println("debug " + x + " " + y);
-        if (!spaceFound) {
-            Error OverlapError = new Error("Overlapping piece");
-            throw OverlapError;
-        } else {
+//        System.out.println("debug " + x + " " + piecesInColumn[x]);
+        if (piecesInColumn[x] < 6) {
+            int y = piecesInColumn[x];
             grid[x][y] = new Piece(x * spaceWidth + xOffset + spaceWidth / 2, screenH - (y * spaceHeight) - yOffset - spaceHeight / 2, isRed); //25 is the current radius, could use variable to replace it
             g.getChildren().add(grid[x][y]);
             piecesInColumn[x] += 1; //so we know how many pieces are already in each column
             return g;
+        } else {
+            Error OverlapError = new Error("Overlapping piece");
+            throw OverlapError;
         } 
     }
     
     public boolean checkConnect4(int x) {
-        int y = 0;
-        for (int i = 0; i < height; i++) {
-            if (grid[x][i] != null) y = i;
-            else break;
-        }
+        int y = piecesInColumn[x] - 1;
         Piece p = grid[x][y];
         boolean pieceIsRed = p.getIsRed(); //p.getIsRed() after or whatever method
         return checkRow(x, y, p, pieceIsRed) || checkColumn(x, y, p, pieceIsRed) || checkDiagUpRight(x, y, p, pieceIsRed) || checkDiagUpLeft(x, y, p, pieceIsRed);
@@ -114,7 +104,7 @@ public class Grid {
                     }
                     else checkLeft = false;
                 } else checkLeft = false;
-            }
+            } else checkLeft = false;
             if (x2 < width && checkRight) {
                 if (!(grid[x2][y] == null)) {
                     if (grid[x2][y].getIsRed() == pieceIsRed) {
@@ -123,7 +113,7 @@ public class Grid {
                     }
                     else checkRight = false;
                 } else checkRight = false;
-            }
+            } else checkRight = false;
             if (!(checkRight || checkLeft)) break;
         }
         clearConnectedList();
@@ -149,6 +139,7 @@ public class Grid {
     }
     
     private boolean checkDiagUpRight(int x, int y, Piece p, boolean pieceIsRed) {
+        
         int connected = 1;
         int x1 = x; //checks pieces to left
         int x2 = x; // "" to right
@@ -161,6 +152,9 @@ public class Grid {
             x2 += 1;
             y1 -= 1;
             y2 += 1;
+            
+//            System.out.println("debug upright" + x1 + " " + y1);
+//            System.out.println("debug upright" + x2 + " " + y2);
             
             if (connected == 4) return true;
             if (x1 >= 0 && checkLeft && y1 >= 0) {
@@ -201,6 +195,9 @@ public class Grid {
             y1 += 1;
             y2 -= 1;
             
+//            System.out.println("debug upleft" + x1 + " " + y1);
+//            System.out.println("debug upleft" + x2 + " " + y2);
+//            
             if (connected == 4) return true;
             if (x1 >= 0 && checkLeft && y1 < height) {
                 if (grid[x1][y1] != null) {
@@ -230,9 +227,5 @@ public class Grid {
     
     public ArrayList<Pair<Integer, Integer>> getConnectedCoords() {
         return connectedCoords;
-    }
-    
-    public void drawPiece() {
-            
     }
 }
