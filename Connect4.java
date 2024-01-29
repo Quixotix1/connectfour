@@ -169,6 +169,7 @@ public class App extends Application {
             @Override
             public void handle(ActionEvent e){
                 restart(grid, restartButton, grid.getPieceList(), highlight);
+                highlight.clearWinPieces(root);
             }
         });
     }
