@@ -80,11 +80,12 @@ public class Highlight{
      * @param pos the position of tiles that create the four-in-a-row.
      * @author josh
      */
-    public void addWinHighlight(ArrayList<Pair<Integer, Integer>> pos) {
+    public void addWinHighlight(ArrayList<Pair<Integer, Integer>> pos, ArrayList<Circle> pieces) {
         pos.forEach((c) -> {
             Circle circle = new Circle(55, grid.getPiece(c.getKey(), c.getValue()).getIsRed() ? Color.PINK : Color.ORANGE);
             circle.setCenterX(c.getKey());
             circle.setCenterY(c.getValue());
+            pieces.add(circle);
         });
     }
     
