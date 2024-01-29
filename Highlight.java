@@ -25,6 +25,7 @@ public class Highlight{
     private boolean colour;
     private Circle ghostPiece = new Circle();
     private boolean isThereAPiece = false;
+    private ArrayList<Circle> winPieces = new ArrayList<Circle>();
 
     public Highlight(boolean col,double rad, double w, double h, Grid gr){//I need the width and height of the board, not the window
         colour = col;
@@ -33,7 +34,12 @@ public class Highlight{
         height = h;
         grid = gr;
     }
-    
+    public void clearWinPieces(Group group){
+        winPieces.forEach((p) -> {
+            group.getChildren().remove(p);
+        });
+        winPieces = new ArrayList<Circle>();
+    }
     //call in getMousePos
     public Circle drawGhostPiece( Group group, int[] piecesInColumn, double xOffset, double yOffset){
         //check which column the mouse is in
@@ -90,8 +96,8 @@ public class Highlight{
             circle.setCenterX(x);
             circle.setCenterY(y);
             group.getChildren().add(circle);
+            winPieces.add(circle);
         });
-        
     }
     
     
