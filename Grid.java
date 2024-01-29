@@ -232,12 +232,9 @@ public class Grid {
         return connectedCoords;
     }
     
-    public void drawPiece() { //unused???
-            
-    }
-    
     public void restart()
     {
        grid = new Piece[width][height]; //this does remove the old information from the memory right? Don't want to be wasteful...
+       clearConnectedList();
     }
 }
