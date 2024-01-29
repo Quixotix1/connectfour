@@ -29,7 +29,7 @@ public class Grid {
     private double screenH;
     private Piece[][] grid;
     private ArrayList<Pair<Integer, Integer>> connectedCoords = new ArrayList<>();
-    private ArrayList<Piece> drawPieceList = new ArrayList<>();
+    private ArrayList<Piece> pieceList = new ArrayList<>();
     private int[] piecesInColumn = new int[7];
     
     public Grid (int w, int h, double spaceW, double spaceH, double Xoffset, double Yoffset, double screenH) {
@@ -63,34 +63,31 @@ public class Grid {
         return !(grid[x][y] == null);
     }
     
+    public ArrayList<Piece> getPieceList() {
+       return pieceList;
+    }
+    
     public Group placePiece(int x, boolean isRed, Group g) {
-        boolean spaceFound = false;
-        int y = -1;
-        for (int i = 0; i < height; i++) {
-            if (grid[x][i] == null) {
-                y = i;
-                spaceFound = true;
-                break;
-            }
-        }
-//        System.out.println("debug " + x + " " + y);
-        if (!spaceFound) {
+    
+
+        if (piecesInColumn[x] == 6) {
             Error OverlapError = new Error("Overlapping piece");
             throw OverlapError;
         } else {
-            grid[x][y] = new Piece(x * spaceWidth + xOffset + spaceWidth / 2, screenH - (y * spaceHeight) - yOffset - spaceHeight / 2, isRed); //25 is the current radius, could use variable to replace it
+            int y = piecesInColumn[x];
+            //        System.out.println("debug " + x + " " + y);
+            Piece p = new Piece(x * spaceWidth + xOffset + spaceWidth / 2, screenH - (y * spaceHeight) - yOffset - spaceHeight / 2, isRed); 
+            grid[x][y] = p;
+            pieceList.add(p);
             g.getChildren().add(grid[x][y]);
             piecesInColumn[x] += 1; //so we know how many pieces are already in each column
+            
             return g;
         } 
     }
     
     public boolean checkConnect4(int x) {
-        int y = 0;
-        for (int i = 0; i < height; i++) {
-            if (grid[x][i] != null) y = i;
-            else break;
-        }
+        int y = piecesInColumn[x] - 1;
         Piece p = grid[x][y];
         boolean pieceIsRed = p.getIsRed(); //p.getIsRed() after or whatever method
         return checkRow(x, y, p, pieceIsRed) || checkColumn(x, y, p, pieceIsRed) || checkDiagUpRight(x, y, p, pieceIsRed) || checkDiagUpLeft(x, y, p, pieceIsRed);
