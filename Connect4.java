@@ -1,25 +1,18 @@
-package com.mycompany.connectfour;
+package com.mycompany.connect4;
 
 import java.util.ArrayList;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.control.Button;
 import javafx.scene.shape.Line;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.stage.Screen;
-import javafx.scene.shape.*;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.control.Button;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
@@ -30,7 +23,7 @@ import javafx.scene.text.Font;
 /**
  * JavaFX App
  */
-public class Connect4 extends Application {
+public class App extends Application {
     //below are some constants
     static final int COLUMN_NUMBER = 7;
     static final int ROW_NUMBER = 6;
@@ -44,20 +37,26 @@ public class Connect4 extends Application {
     final double boardWidth = screenWidth - xOffset * 2;
     final double boardHeight = screenHeight - yOffset * 2;
     boolean redTurn = true;
-    Group root = new Group();
+
+    Group root = new Group(); //these things must be global otherwise compiler gets mad
+    Scene gameScene = null;
+    
+    EventHandler<MouseEvent> mouseClickHandler;
+    
     @Override
     public void start(Stage primaryStage) {
         Scene startScene;
-        Scene gameScene;
+        
+        
         
         Group startGroup = new Group();
-       // ArrayList<Highlight> ghostPieces = new ArrayList<>();
         ArrayList<Line> verticalLines = new ArrayList<>();
         ArrayList<Line> horizontalLines = new ArrayList<>();
         
-        
+        //Initialize other classes
         Grid grid = new Grid(COLUMN_NUMBER, ROW_NUMBER, spaceWidth, spaceHeight, xOffset, yOffset, screenHeight);
         Highlight highlight = new Highlight(true, 50, boardWidth, boardHeight , grid);
+        
         //Starting group setup
         Label titleLabel = new Label("Connect 4");
         titleLabel.setFont(new Font("Arial", 350));
@@ -75,7 +74,7 @@ public class Connect4 extends Application {
         for(int i = 0; i < COLUMN_NUMBER + 1; i++) //initialize lines for board
         {
             verticalLines.add(new Line());
-            if (i < COLUMN_NUMBER) //an attempt to be more efficient with initializing the board
+            if (i < COLUMN_NUMBER) 
             {
                 horizontalLines.add(new Line());
             }   
@@ -84,6 +83,7 @@ public class Connect4 extends Application {
         initVerticalLines(verticalLines);
         initHorizontalLines(horizontalLines);
 
+        //Root group setup
         for (int i = 0; i < verticalLines.size(); i++)
         {
            root.getChildren().add(verticalLines.get(i)); 
@@ -92,39 +92,42 @@ public class Connect4 extends Application {
         {
             root.getChildren().add(horizontalLines.get(i));
         }
+        Button restartButton = new Button("Restart");
+        restartButton.setLayoutX((screenWidth/2) - 150);
+        restartButton.setLayoutY(screenHeight/4*3);
         
-        gameScene = new Scene(root, screenWidth, screenHeight);
-        //printGhostPieces
-        highlight.getMousePos(gameScene, root, grid.getPiecesInColumn(), xOffset, yOffset);
-        
-         EventHandler<MouseEvent> mouseClickHandler = new EventHandler<>() { 
+         mouseClickHandler = new EventHandler<>() { 
          @Override 
          public void handle(MouseEvent e) {
             int index = findIndex(e.getX());
-            System.out.println(index);
             try
             {
                 root = grid.placePiece(index, redTurn, root);
-                System.out.println(grid.checkConnect4(index));
-                redTurn = highlight.setColour();
+                if(!grid.checkConnect4(index)) redTurn = highlight.setColour(); //not sure how inefficient the if statement is
+                else
+                {
+                    gameScene.removeEventFilter(MouseEvent.MOUSE_PRESSED, mouseClickHandler); //this will prevent any more pieces from being placed
+                }
             } catch(Error OverlapError)
             {
                 System.out.println("That column is full.");
             }
             catch(Exception ArraryIndexOutOfBoundsException)
             {
-                System.out.println("That move is out of bounds!");
+                System.out.println("That move is out of bounds!"); //this doesn't catch perfectly accurately. This is a truncation issue; to be fixed
             }
          }
       };  
+
+         
 
        
         
         startScene = new Scene(startGroup, screenWidth, screenHeight);
         startScene.setFill(Color.PINK);
+        gameScene = new Scene(root, screenWidth, screenHeight);
         gameScene.setFill(Color.LIGHTGREY);
-        gameScene.addEventFilter(MouseEvent.MOUSE_CLICKED, mouseClickHandler);
-        //gameScene.setOnMouseMoved(mouseMovedHandler); //if this is for the highlight code, I don't need it
+        gameScene.addEventHandler(MouseEvent.MOUSE_CLICKED, mouseClickHandler);
         primaryStage.setScene(startScene);
         primaryStage.setWidth(screenWidth);
         primaryStage.setHeight(screenHeight);
@@ -132,19 +135,29 @@ public class Connect4 extends Application {
         primaryStage.setY(screenBounds.getMinY());
         primaryStage.setTitle("Primary Window");
         primaryStage.show();
+
+        //printGhostPieces
+        highlight.getMousePos(gameScene, root, grid.getPiecesInColumn(), xOffset, yOffset); //should we change this method name? Kind of misleading
         
         startButton.setOnAction(new EventHandler<ActionEvent>(){
             @Override
             public void handle(ActionEvent e){
+              startButton.setDefaultButton(false);
               primaryStage.setScene(gameScene);
             }
           });
+        
+        restartButton.setOnAction(new EventHandler<ActionEvent>(){
+            @Override
+            public void handle(ActionEvent e){
+                restartButton.setDefaultButton(true);
+                restart(grid);
+            }
+        });
     }
 
     public static void main(String[] args) {
-        
         launch();
-  
     }
     
     private void initVerticalLines(ArrayList<Line> verticalLines)
@@ -163,7 +176,7 @@ public class Connect4 extends Application {
     {
         for (int i = 0; i < horizontalLines.size(); i++)
         {
-            horizontalLines.get(i).setStartX((screenWidth / (COLUMN_NUMBER + 4)) * 2); //these numbers are all just random bs that make them allign nicely
+            horizontalLines.get(i).setStartX((screenWidth / (COLUMN_NUMBER + 4)) * 2); 
             horizontalLines.get(i).setEndX(screenWidth / (COLUMN_NUMBER + 4) * (9));
             horizontalLines.get(i).setStartY((screenHeight / (ROW_NUMBER + 2)) * (i + 1));
             horizontalLines.get(i).setEndY((screenHeight / (ROW_NUMBER + 2)) * (i + 1));
@@ -174,6 +187,11 @@ public class Connect4 extends Application {
     private int findIndex(double mouseX)
     {
          return (int) ((mouseX - (screenWidth / (COLUMN_NUMBER + 4) * 2)) / (screenWidth / (COLUMN_NUMBER + 4)));
+    }
+    
+    private void restart(Grid grid)
+    {
+        grid.restart();
     }
 
 }
