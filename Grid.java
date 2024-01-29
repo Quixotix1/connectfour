@@ -28,7 +28,7 @@ public class Grid {
     private double yOffset;
     private double screenH;
     private Piece[][] grid;
-    private ArrayList<Pair<Integer, Integer>> connectedCoords = new ArrayList<>();
+    private ArrayList<Pair<Double, Double>> connectedCoords = new ArrayList<>();
     private ArrayList<Piece> pieceList = new ArrayList<>();
     private int[] piecesInColumn = new int[7];
     
@@ -107,7 +107,7 @@ public class Grid {
                 if (grid[x1][y] != null) {
                     if (grid[x1][y].getIsRed() == pieceIsRed) {
                         connected += 1;
-                        connectedCoords.add(new Pair<>(x1, y));
+                        connectedCoords.add(new Pair<>(x1 * spaceWidth + xOffset + spaceWidth / 2, screenH - (y * spaceHeight) - yOffset - spaceHeight / 2));
                     }
                     else checkLeft = false;
                 } else checkLeft = false;
@@ -116,7 +116,7 @@ public class Grid {
                 if (!(grid[x2][y] == null)) {
                     if (grid[x2][y].getIsRed() == pieceIsRed) {
                         connected += 1;
-                        connectedCoords.add(new Pair<>(x2, y));
+                        connectedCoords.add(new Pair<>(x2 * spaceWidth + xOffset + spaceWidth / 2, screenH - (y * spaceHeight) - yOffset - spaceHeight / 2));
                     }
                     else checkRight = false;
                 } else checkRight = false;
@@ -136,7 +136,7 @@ public class Grid {
             else if (y >= 0) {
                 if (grid[x][y].getIsRed() == pieceIsRed) {
                     connected += 1;
-                    connectedCoords.add(new Pair<>(x, y));
+                    connectedCoords.add(new Pair<>(x * spaceWidth + xOffset + spaceWidth / 2, screenH - (y * spaceHeight) - yOffset - spaceHeight / 2));
                 }
                 else break;
             } else break;
@@ -164,7 +164,7 @@ public class Grid {
                 if (grid[x1][y1] != null) {
                     if (grid[x1][y1].getIsRed() == pieceIsRed) {
                         connected += 1;
-                        connectedCoords.add(new Pair<>(x1, y1));
+                        connectedCoords.add(new Pair<>(x1 * spaceWidth + xOffset + spaceWidth / 2, screenH - (y1 * spaceHeight) - yOffset - spaceHeight / 2));
                     }
                     else checkLeft = false;
                 } else checkLeft = false;
@@ -173,7 +173,7 @@ public class Grid {
                 if (grid[x2][y2] != null) {
                     if (grid[x2][y2].getIsRed() == pieceIsRed) {
                         connected += 1;
-                        connectedCoords.add(new Pair<>(x2, y2));
+                        connectedCoords.add(new Pair<>(x2 * spaceWidth + xOffset + spaceWidth / 2, screenH - (y2 * spaceHeight) - yOffset - spaceHeight / 2));
                     }
                     else checkRight = false;
                 } else checkRight = false;
@@ -203,7 +203,7 @@ public class Grid {
                 if (grid[x1][y1] != null) {
                     if (grid[x1][y1].getIsRed() == pieceIsRed) {
                         connected += 1;
-                        connectedCoords.add(new Pair<>(x1, y1));
+                        connectedCoords.add(new Pair<>(x1 * spaceWidth + xOffset + spaceWidth / 2, screenH - (y1 * spaceHeight) - yOffset - spaceHeight / 2));
                     } else checkLeft = false;
                 } else checkLeft = false;
             } else checkLeft = false;
@@ -211,7 +211,7 @@ public class Grid {
                 if (grid[x2][y2] != null) {
                     if (grid[x2][y2].getIsRed() == pieceIsRed) {
                         connected += 1;
-                        connectedCoords.add(new Pair<>(x2, y2));
+                        connectedCoords.add(new Pair<>(x2 * spaceWidth + xOffset + spaceWidth / 2, screenH - (y2 * spaceHeight) - yOffset - spaceHeight / 2));
                     } else checkRight = false;
                 } else checkRight = false;
             } else checkRight = false;
@@ -225,7 +225,7 @@ public class Grid {
         connectedCoords = new ArrayList<>();
     }
     
-    public ArrayList<Pair<Integer, Integer>> getConnectedCoords() {
+    public ArrayList<Pair<Double, Double>> getConnectedCoords() {
         return connectedCoords;
     }
     
