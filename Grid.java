@@ -28,7 +28,7 @@ public class Grid {
     private double yOffset;
     private double screenH;
     private Piece[][] grid;
-    private ArrayList<Pair<Double, Double>> connectedCoords = new ArrayList<>();
+    private ArrayList<Pair<Integer, Integer>> connectedCoords = new ArrayList<>();
     private ArrayList<Piece> pieceList = new ArrayList<>();
     private int[] piecesInColumn = new int[7];
     
@@ -51,43 +51,50 @@ public class Grid {
         return width;
     }
     
-    public Piece getPiece(int x, int y) {
-        return grid[x][y];
-    }
-        
     public int[] getPiecesInColumn(){
         return piecesInColumn;
-    }
-        
-    public boolean isTaken(int x, int y) {
-        return !(grid[x][y] == null);
     }
     
     public ArrayList<Piece> getPieceList() {
        return pieceList;
     }
     
-    public Group placePiece(int x, boolean isRed, Group g) {
+    public Piece getPiece(int x, int y) {
+        return grid[x][y];
+    }
     
-
-        if (piecesInColumn[x] == 6) {
+    public boolean isTaken(int x, int y) {
+        return !(grid[x][y] == null);
+    }
+    
+    public Group placePiece(int x, boolean isRed, Group g) {
+        boolean spaceFound = false;
+        int y = -1;
+        for (int i = 0; i < height; i++) {
+            if (grid[x][i] == null) {
+                y = i;
+                spaceFound = true;
+                break;
+            }
+        }
+//        System.out.println("debug " + x + " " + y);
+        if (!spaceFound) {
             Error OverlapError = new Error("Overlapping piece");
             throw OverlapError;
         } else {
-            int y = piecesInColumn[x];
-            //        System.out.println("debug " + x + " " + y);
-            Piece p = new Piece(x * spaceWidth + xOffset + spaceWidth / 2, screenH - (y * spaceHeight) - yOffset - spaceHeight / 2, isRed); 
-            grid[x][y] = p;
-            pieceList.add(p);
+            grid[x][y] = new Piece(x * spaceWidth + xOffset + spaceWidth / 2, screenH - (y * spaceHeight) - yOffset - spaceHeight / 2, isRed); //25 is the current radius, could use variable to replace it
+            piecesInColumn[x] += 1;
             g.getChildren().add(grid[x][y]);
-            piecesInColumn[x] += 1; //so we know how many pieces are already in each column
-            
             return g;
         } 
     }
     
     public boolean checkConnect4(int x) {
-        int y = piecesInColumn[x] - 1;
+        int y = 0;
+        for (int i = 0; i < height; i++) {
+            if (grid[x][i] != null) y = i;
+            else break;
+        }
         Piece p = grid[x][y];
         boolean pieceIsRed = p.getIsRed(); //p.getIsRed() after or whatever method
         return checkRow(x, y, p, pieceIsRed) || checkColumn(x, y, p, pieceIsRed) || checkDiagUpRight(x, y, p, pieceIsRed) || checkDiagUpLeft(x, y, p, pieceIsRed);
@@ -104,23 +111,23 @@ public class Grid {
             x2 += 1;
             if (connected == 4) return true;
             if (x1 >= 0 && checkLeft) {
-                if (grid[x1][y] != null) {
+                if (!(grid[x1][y] == null)) {
                     if (grid[x1][y].getIsRed() == pieceIsRed) {
                         connected += 1;
-                        connectedCoords.add(new Pair<>(x1 * spaceWidth + xOffset + spaceWidth / 2, screenH - (y * spaceHeight) - yOffset - spaceHeight / 2));
+                        connectedCoords.add(new Pair<>(x1, y));
                     }
                     else checkLeft = false;
                 } else checkLeft = false;
-            } else checkLeft = false;
+            }
             if (x2 < width && checkRight) {
                 if (!(grid[x2][y] == null)) {
                     if (grid[x2][y].getIsRed() == pieceIsRed) {
                         connected += 1;
-                        connectedCoords.add(new Pair<>(x2 * spaceWidth + xOffset + spaceWidth / 2, screenH - (y * spaceHeight) - yOffset - spaceHeight / 2));
+                        connectedCoords.add(new Pair<>(x2, y));
                     }
                     else checkRight = false;
                 } else checkRight = false;
-            } else checkRight = false;
+            }
             if (!(checkRight || checkLeft)) break;
         }
         clearConnectedList();
@@ -136,7 +143,7 @@ public class Grid {
             else if (y >= 0) {
                 if (grid[x][y].getIsRed() == pieceIsRed) {
                     connected += 1;
-                    connectedCoords.add(new Pair<>(x * spaceWidth + xOffset + spaceWidth / 2, screenH - (y * spaceHeight) - yOffset - spaceHeight / 2));
+                    connectedCoords.add(new Pair<>(x, y));
                 }
                 else break;
             } else break;
@@ -164,7 +171,7 @@ public class Grid {
                 if (grid[x1][y1] != null) {
                     if (grid[x1][y1].getIsRed() == pieceIsRed) {
                         connected += 1;
-                        connectedCoords.add(new Pair<>(x1 * spaceWidth + xOffset + spaceWidth / 2, screenH - (y1 * spaceHeight) - yOffset - spaceHeight / 2));
+                        connectedCoords.add(new Pair<>(x1, y1));
                     }
                     else checkLeft = false;
                 } else checkLeft = false;
@@ -173,7 +180,7 @@ public class Grid {
                 if (grid[x2][y2] != null) {
                     if (grid[x2][y2].getIsRed() == pieceIsRed) {
                         connected += 1;
-                        connectedCoords.add(new Pair<>(x2 * spaceWidth + xOffset + spaceWidth / 2, screenH - (y2 * spaceHeight) - yOffset - spaceHeight / 2));
+                        connectedCoords.add(new Pair<>(x2, y2));
                     }
                     else checkRight = false;
                 } else checkRight = false;
@@ -203,7 +210,7 @@ public class Grid {
                 if (grid[x1][y1] != null) {
                     if (grid[x1][y1].getIsRed() == pieceIsRed) {
                         connected += 1;
-                        connectedCoords.add(new Pair<>(x1 * spaceWidth + xOffset + spaceWidth / 2, screenH - (y1 * spaceHeight) - yOffset - spaceHeight / 2));
+                        connectedCoords.add(new Pair<>(x1, y1));
                     } else checkLeft = false;
                 } else checkLeft = false;
             } else checkLeft = false;
@@ -211,7 +218,7 @@ public class Grid {
                 if (grid[x2][y2] != null) {
                     if (grid[x2][y2].getIsRed() == pieceIsRed) {
                         connected += 1;
-                        connectedCoords.add(new Pair<>(x2 * spaceWidth + xOffset + spaceWidth / 2, screenH - (y2 * spaceHeight) - yOffset - spaceHeight / 2));
+                        connectedCoords.add(new Pair<>(x2, y2));
                     } else checkRight = false;
                 } else checkRight = false;
             } else checkRight = false;
@@ -225,11 +232,11 @@ public class Grid {
         connectedCoords = new ArrayList<>();
     }
     
-    public ArrayList<Pair<Double, Double>> getConnectedCoords() {
+    public ArrayList<Pair<Integer, Integer>> getConnectedCoords() {
         return connectedCoords;
     }
     
-    public void restart()
+     public void restart()
     {
        piecesInColumn = new int[width];
        grid = new Piece[width][height]; //this does remove the old information from the memory right? Don't want to be wasteful...
