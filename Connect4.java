@@ -1,4 +1,4 @@
-package com.mycompany.connectfour;
+package com.mycompany.connect4;
 
 import java.util.ArrayList;
 import javafx.application.Application;
@@ -15,6 +15,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.control.Button;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 
 
 
@@ -23,7 +24,7 @@ import javafx.scene.text.Font;
 /**
  * JavaFX App
  */
-public class Connect4 extends Application {
+public class App extends Application {
     //below are some constants
     static final int COLUMN_NUMBER = 7;
     static final int ROW_NUMBER = 6;
@@ -38,6 +39,7 @@ public class Connect4 extends Application {
     final double boardHeight = screenHeight - yOffset * 2;
     boolean redTurn = true;
     boolean gameOver = false;
+    Text gameOverText;
 
     Group root = new Group(); //these things must be global otherwise compiler gets mad
     Scene gameScene = null;
@@ -47,8 +49,6 @@ public class Connect4 extends Application {
     @Override
     public void start(Stage primaryStage) {
         Scene startScene;
-        
-        
         
         Group startGroup = new Group();
         ArrayList<Line> verticalLines = new ArrayList<>();
@@ -61,9 +61,10 @@ public class Connect4 extends Application {
         //Starting group setup
         Label titleLabel = new Label("Connect 4");
         titleLabel.setFont(new Font("Arial", 350));
+        
         //titleLabel.setBackground(new Background(new BackgroundFill(Color.PINK, CornerRadii.EMPTY, Insets.EMPTY)));
         Button startButton = new Button("Start");
-        startButton.setDefaultButton(true);
+        startButton.setDefaultButton(true); //fun fact, this triggers the button if you hit enter
         startButton.setLayoutX((screenWidth/2) - 150);
         startButton.setLayoutY((screenHeight / 3 * 2) - 100);
         startButton.setPrefSize(300, 100);
@@ -94,24 +95,32 @@ public class Connect4 extends Application {
             root.getChildren().add(horizontalLines.get(i));
         }
         Button restartButton = new Button("Restart");
-        restartButton.setLayoutX((screenWidth/2) - 150);
-        restartButton.setLayoutY(screenHeight/4*3);
+        restartButton.setLayoutX(screenWidth/8*7);
+        restartButton.setLayoutY(screenHeight/5);
+        restartButton.setPrefSize(100, 50);
+        restartButton.setFont(new Font("Arial", 20));
         
          mouseClickHandler = new EventHandler<>() { 
          @Override 
          public void handle(MouseEvent e) {
-             if (!gameOver)
-             {
+            // if (!gameOver)
+             //{
                 int index = findIndex(e.getX());
                 try
                 {
                     root = grid.placePiece(index, redTurn, root);
-                    if(!grid.checkConnect4(index)) redTurn = highlight.setColour(); //not sure how inefficient the if statement is
+                    if(!grid.checkConnect4(index)) redTurn = highlight.setColour();
                     else
                     {
+                        gameScene.removeEventHandler(MouseEvent.MOUSE_CLICKED, mouseClickHandler);
                         gameOver = true;
                         root.getChildren().add(restartButton);
                         restartButton.setDefaultButton(true);
+                        if (redTurn){gameOverText = new Text("Game Over, Red Wins!");} else {gameOverText = new Text("Game Over, Yellow Wins!");}
+                        gameOverText.setX((screenWidth / 2) - 350);
+                        gameOverText.setY(screenHeight / 9);
+                        gameOverText.setStyle("-fx-font: 50 arial;");
+                        root.getChildren().add(gameOverText);
                     }
                 } catch(Error OverlapError)
                 {
@@ -122,7 +131,7 @@ public class Connect4 extends Application {
                     System.out.println("That move is out of bounds!"); //this doesn't catch perfectly accurately. This is a truncation issue; to be fixed
                 }
              }
-            }
+            //}
           };  
           
 
@@ -145,6 +154,7 @@ public class Connect4 extends Application {
 
         //printGhostPieces
         highlight.getMousePos(gameScene, root, grid.getPiecesInColumn(), xOffset, yOffset); //should we change this method name? Kind of misleading
+        
         startButton.setOnAction(new EventHandler<ActionEvent>(){
             @Override
             public void handle(ActionEvent e){
@@ -156,7 +166,7 @@ public class Connect4 extends Application {
         restartButton.setOnAction(new EventHandler<ActionEvent>(){
             @Override
             public void handle(ActionEvent e){
-                restart(grid, restartButton, grid.getPieceList());
+                restart(grid, restartButton, grid.getPieceList(), highlight);
             }
         });
     }
@@ -194,15 +204,19 @@ public class Connect4 extends Application {
          return (int) ((mouseX - (screenWidth / (COLUMN_NUMBER + 4) * 2)) / (screenWidth / (COLUMN_NUMBER + 4)));
     }
     
-    private void restart(Grid grid, Button restartButton, ArrayList<Piece> pieceList)
+    private void restart(Grid grid, Button restartButton, ArrayList<Piece> pieceList, Highlight highlight)
     {
         grid.restart();
+        gameScene.removeEventHandler(MouseEvent.MOUSE_CLICKED, mouseClickHandler);
         root.getChildren().remove(restartButton);
         for (int i = 0; i < pieceList.size(); i++)
         {
             root.getChildren().remove(pieceList.get(i));
         }
+        highlight.getMousePos(gameScene, root, grid.getPiecesInColumn(), xOffset, yOffset);
         gameOver = false;
+        gameScene.addEventHandler(MouseEvent.MOUSE_CLICKED, mouseClickHandler);
+        root.getChildren().remove(gameOverText);
     }
 
 }
