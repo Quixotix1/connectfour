@@ -231,6 +231,7 @@ public class Grid {
     
     public void restart()
     {
+       piecesInColumn = new int[width];
        grid = new Piece[width][height]; //this does remove the old information from the memory right? Don't want to be wasteful...
        clearConnectedList();
     }
