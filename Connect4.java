@@ -1,4 +1,4 @@
-package com.mycompany.connect4;
+package com.mycompany.connectfour;
 
 import java.util.ArrayList;
 import javafx.application.Application;
@@ -23,7 +23,7 @@ import javafx.scene.text.Font;
 /**
  * JavaFX App
  */
-public class App extends Application {
+public class Connect4 extends Application {
     //below are some constants
     static final int COLUMN_NUMBER = 7;
     static final int ROW_NUMBER = 6;
@@ -37,6 +37,7 @@ public class App extends Application {
     final double boardWidth = screenWidth - xOffset * 2;
     final double boardHeight = screenHeight - yOffset * 2;
     boolean redTurn = true;
+    boolean gameOver = false;
 
     Group root = new Group(); //these things must be global otherwise compiler gets mad
     Scene gameScene = null;
@@ -99,25 +100,31 @@ public class App extends Application {
          mouseClickHandler = new EventHandler<>() { 
          @Override 
          public void handle(MouseEvent e) {
-            int index = findIndex(e.getX());
-            try
-            {
-                root = grid.placePiece(index, redTurn, root);
-                if(!grid.checkConnect4(index)) redTurn = highlight.setColour(); //not sure how inefficient the if statement is
-                else
+             if (!gameOver)
+             {
+                int index = findIndex(e.getX());
+                try
                 {
-                    gameScene.removeEventFilter(MouseEvent.MOUSE_PRESSED, mouseClickHandler); //this will prevent any more pieces from being placed
+                    root = grid.placePiece(index, redTurn, root);
+                    if(!grid.checkConnect4(index)) redTurn = highlight.setColour(); //not sure how inefficient the if statement is
+                    else
+                    {
+                        gameOver = true;
+                        root.getChildren().add(restartButton);
+                        restartButton.setDefaultButton(true);
+                    }
+                } catch(Error OverlapError)
+                {
+                    System.out.println("That column is full.");
                 }
-            } catch(Error OverlapError)
-            {
-                System.out.println("That column is full.");
+                catch(Exception ArraryIndexOutOfBoundsException)
+                {
+                    System.out.println("That move is out of bounds!"); //this doesn't catch perfectly accurately. This is a truncation issue; to be fixed
+                }
+             }
             }
-            catch(Exception ArraryIndexOutOfBoundsException)
-            {
-                System.out.println("That move is out of bounds!"); //this doesn't catch perfectly accurately. This is a truncation issue; to be fixed
-            }
-         }
-      };  
+          };  
+          
 
          
 
@@ -138,7 +145,6 @@ public class App extends Application {
 
         //printGhostPieces
         highlight.getMousePos(gameScene, root, grid.getPiecesInColumn(), xOffset, yOffset); //should we change this method name? Kind of misleading
-        
         startButton.setOnAction(new EventHandler<ActionEvent>(){
             @Override
             public void handle(ActionEvent e){
@@ -150,8 +156,7 @@ public class App extends Application {
         restartButton.setOnAction(new EventHandler<ActionEvent>(){
             @Override
             public void handle(ActionEvent e){
-                restartButton.setDefaultButton(true);
-                restart(grid);
+                restart(grid, restartButton, grid.getPieceList());
             }
         });
     }
@@ -189,9 +194,15 @@ public class App extends Application {
          return (int) ((mouseX - (screenWidth / (COLUMN_NUMBER + 4) * 2)) / (screenWidth / (COLUMN_NUMBER + 4)));
     }
     
-    private void restart(Grid grid)
+    private void restart(Grid grid, Button restartButton, ArrayList<Piece> pieceList)
     {
         grid.restart();
+        root.getChildren().remove(restartButton);
+        for (int i = 0; i < pieceList.size(); i++)
+        {
+            root.getChildren().remove(pieceList.get(i));
+        }
+        gameOver = false;
     }
 
 }
