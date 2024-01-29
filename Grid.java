@@ -107,14 +107,14 @@ public class Grid {
             x2 += 1;
             if (connected == 4) return true;
             if (x1 >= 0 && checkLeft) {
-                if (!(grid[x1][y] == null)) {
+                if (grid[x1][y] != null) {
                     if (grid[x1][y].getIsRed() == pieceIsRed) {
                         connected += 1;
                         connectedCoords.add(new Pair<>(x1, y));
                     }
                     else checkLeft = false;
                 } else checkLeft = false;
-            }
+            } else checkLeft = false;
             if (x2 < width && checkRight) {
                 if (!(grid[x2][y] == null)) {
                     if (grid[x2][y].getIsRed() == pieceIsRed) {
@@ -123,7 +123,7 @@ public class Grid {
                     }
                     else checkRight = false;
                 } else checkRight = false;
-            }
+            } else checkRight = false;
             if (!(checkRight || checkLeft)) break;
         }
         clearConnectedList();
