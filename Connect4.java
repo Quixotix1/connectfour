@@ -14,6 +14,7 @@ import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.control.Button;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
@@ -53,6 +54,7 @@ public class App extends Application {
         Group startGroup = new Group();
         ArrayList<Line> verticalLines = new ArrayList<>();
         ArrayList<Line> horizontalLines = new ArrayList<>();
+        ArrayList<Circle> highlightPieces = new ArrayList<>();
         
         //Initialize other classes
         Grid grid = new Grid(COLUMN_NUMBER, ROW_NUMBER, spaceWidth, spaceHeight, xOffset, yOffset, screenHeight);
@@ -121,6 +123,11 @@ public class App extends Application {
                         gameOverText.setY(screenHeight / 9);
                         gameOverText.setStyle("-fx-font: 50 arial;");
                         root.getChildren().add(gameOverText);
+                        highlight.addWinHighlight(grid.getConnectedCoords(), highlightPieces);
+                        for (int i = 0; i < highlightPieces.size(); i++)
+                        {
+                            root.getChildren().add(highlightPieces.get(i));
+                        }
                     }
                 } catch(Error OverlapError)
                 {
@@ -166,7 +173,7 @@ public class App extends Application {
         restartButton.setOnAction(new EventHandler<ActionEvent>(){
             @Override
             public void handle(ActionEvent e){
-                restart(grid, restartButton, grid.getPieceList(), highlight);
+                restart(grid, restartButton, grid.getPieceList(), highlight, highlightPieces);
             }
         });
     }
@@ -204,7 +211,7 @@ public class App extends Application {
          return (int) ((mouseX - (screenWidth / (COLUMN_NUMBER + 4) * 2)) / (screenWidth / (COLUMN_NUMBER + 4)));
     }
     
-    private void restart(Grid grid, Button restartButton, ArrayList<Piece> pieceList, Highlight highlight)
+    private void restart(Grid grid, Button restartButton, ArrayList<Piece> pieceList, Highlight highlight, ArrayList<Circle> highlightPieces)
     {
         grid.restart();
         gameScene.removeEventHandler(MouseEvent.MOUSE_CLICKED, mouseClickHandler);
@@ -217,6 +224,11 @@ public class App extends Application {
         gameOver = false;
         gameScene.addEventHandler(MouseEvent.MOUSE_CLICKED, mouseClickHandler);
         root.getChildren().remove(gameOverText);
+        for (int i = 0; i < highlightPieces.size(); i++)
+        {
+            root.getChildren().remove(highlightPieces.get(i));
+        }
+        highlightPieces.clear(); //this is so future highlighted pieces can be added
     }
 
 }
