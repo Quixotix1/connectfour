@@ -51,53 +51,52 @@ public class Grid {
         return width;
     }
     
+    public Piece getPiece(int x, int y) {
+        return grid[x][y];
+    }
+        
     public int[] getPiecesInColumn(){
         return piecesInColumn;
+    }
+        
+    public boolean isTaken(int x, int y) {
+        return !(grid[x][y] == null);
     }
     
     public ArrayList<Piece> getPieceList() {
        return pieceList;
     }
     
-    public Piece getPiece(int x, int y) {
-        return grid[x][y];
-    }
-    
-    public boolean isTaken(int x, int y) {
-        return !(grid[x][y] == null);
-    }
-    
     public Group placePiece(int x, boolean isRed, Group g) {
-        boolean spaceFound = false;
-        int y = -1;
-        for (int i = 0; i < height; i++) {
-            if (grid[x][i] == null) {
-                y = i;
-                spaceFound = true;
-                break;
-            }
-        }
-//        System.out.println("debug " + x + " " + y);
-        if (!spaceFound) {
+        if (piecesInColumn[x] == 6) {
             Error OverlapError = new Error("Overlapping piece");
             throw OverlapError;
         } else {
-            grid[x][y] = new Piece(x * spaceWidth + xOffset + spaceWidth / 2, screenH - (y * spaceHeight) - yOffset - spaceHeight / 2, isRed); //25 is the current radius, could use variable to replace it
-            piecesInColumn[x] += 1;
+            int y = piecesInColumn[x];
+            //        System.out.println("debug " + x + " " + y);
+            Piece p = new Piece(x * spaceWidth + xOffset + spaceWidth / 2, screenH - (y * spaceHeight) - yOffset - spaceHeight / 2, isRed); 
+            grid[x][y] = p;
+            pieceList.add(p);
             g.getChildren().add(grid[x][y]);
+            piecesInColumn[x] += 1; //so we know how many pieces are already in each column
+            
             return g;
         } 
     }
     
     public boolean checkConnect4(int x) {
-        int y = 0;
-        for (int i = 0; i < height; i++) {
-            if (grid[x][i] != null) y = i;
-            else break;
-        }
+        int y = piecesInColumn[x] - 1;
+//        System.out.println("debug calced y val" + y);
         Piece p = grid[x][y];
         boolean pieceIsRed = p.getIsRed(); //p.getIsRed() after or whatever method
-        return checkRow(x, y, p, pieceIsRed) || checkColumn(x, y, p, pieceIsRed) || checkDiagUpRight(x, y, p, pieceIsRed) || checkDiagUpLeft(x, y, p, pieceIsRed);
+        connectedCoords.add(new Pair<>(x, y));
+        if (checkRow(x, y, p, pieceIsRed) || checkColumn(x, y, p, pieceIsRed) || checkDiagUpRight(x, y, p, pieceIsRed) || checkDiagUpLeft(x, y, p, pieceIsRed)) {
+            return true;
+        } else {
+            clearConnectedList();
+            return false;
+        }
+        
     }
     
     private boolean checkRow(int x, int y, Piece p, boolean pieceIsRed) {
@@ -109,16 +108,16 @@ public class Grid {
         while (true) {
             x1 -= 1;
             x2 += 1;
-            if (connected == 4) return true;
+            
             if (x1 >= 0 && checkLeft) {
-                if (!(grid[x1][y] == null)) {
+                if (grid[x1][y] != null) {
                     if (grid[x1][y].getIsRed() == pieceIsRed) {
                         connected += 1;
                         connectedCoords.add(new Pair<>(x1, y));
                     }
                     else checkLeft = false;
                 } else checkLeft = false;
-            }
+            } else checkLeft = false;
             if (x2 < width && checkRight) {
                 if (!(grid[x2][y] == null)) {
                     if (grid[x2][y].getIsRed() == pieceIsRed) {
@@ -127,28 +126,30 @@ public class Grid {
                     }
                     else checkRight = false;
                 } else checkRight = false;
-            }
-            if (!(checkRight || checkLeft)) break;
+            } else checkRight = false;
+            if (connected == 4) return true;
+            else if (!(checkRight || checkLeft)) break;
         }
-        clearConnectedList();
+        restartConnectedList(x, y);
         return false;
     }
     
     private boolean checkColumn(int x, int y, Piece p, boolean pieceIsRed) {
         int connected = 1;
-
+        int y1 = y;
         while (true) {
-            y -= 1;
-            if (connected == 4) return true;
-            else if (y >= 0) {
-                if (grid[x][y].getIsRed() == pieceIsRed) {
+            y1 -= 1;
+            if (y1 >= 0) {
+                if (grid[x][y1].getIsRed() == pieceIsRed) {
                     connected += 1;
-                    connectedCoords.add(new Pair<>(x, y));
+                    connectedCoords.add(new Pair<>(x, y1));
+                    if (connected == 4) return true;
                 }
                 else break;
             } else break;
         }
-        clearConnectedList();
+        
+        restartConnectedList(x, y);
         return false;
     }
     
@@ -166,7 +167,6 @@ public class Grid {
             y1 -= 1;
             y2 += 1;
             
-            if (connected == 4) return true;
             if (x1 >= 0 && checkLeft && y1 >= 0) {
                 if (grid[x1][y1] != null) {
                     if (grid[x1][y1].getIsRed() == pieceIsRed) {
@@ -185,9 +185,11 @@ public class Grid {
                     else checkRight = false;
                 } else checkRight = false;
             } else checkRight = false;
-            if (!(checkRight || checkLeft)) break;
+            if (connected == 4) return true;
+            else if (!(checkRight || checkLeft)) break;
+            
         }
-        clearConnectedList();
+        restartConnectedList(x, y);
         return false;
     }
     
@@ -205,7 +207,6 @@ public class Grid {
             y1 += 1;
             y2 -= 1;
             
-            if (connected == 4) return true;
             if (x1 >= 0 && checkLeft && y1 < height) {
                 if (grid[x1][y1] != null) {
                     if (grid[x1][y1].getIsRed() == pieceIsRed) {
@@ -222,10 +223,17 @@ public class Grid {
                     } else checkRight = false;
                 } else checkRight = false;
             } else checkRight = false;
-            if (!(checkRight || checkLeft)) break;
+            if (connected == 4) return true;
+            else if (!(checkRight || checkLeft)) break;
         }
-        clearConnectedList();
+        restartConnectedList(x, y);
         return false;
+    }
+    
+    private void restartConnectedList(int x, int y) {
+        connectedCoords = new ArrayList<>();
+        connectedCoords.add(new Pair<>(x, y));
+//        System.out.println("debug clearConnectCoords " + x + " " + y);
     }
     
     private void clearConnectedList() {
@@ -236,7 +244,7 @@ public class Grid {
         return connectedCoords;
     }
     
-     public void restart()
+    public void restart()
     {
        piecesInColumn = new int[width];
        grid = new Piece[width][height]; //this does remove the old information from the memory right? Don't want to be wasteful...
