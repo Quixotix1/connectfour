@@ -20,6 +20,8 @@ public class Highlight{
     final private double radius;
     private static double width;
     private static double height;
+    private double xOffset;
+    private double yOffset;
     private boolean colour;
     private Circle ghostPiece = new Circle();
     private boolean isThereAPiece = false;
@@ -80,16 +82,22 @@ public class Highlight{
      * @param pos the position of tiles that create the four-in-a-row.
      * @author josh
      */
-    public void addWinHighlight(ArrayList<Pair<Integer, Integer>> pos, ArrayList<Circle> pieces) {
+    public void addWinHighlight(ArrayList<Pair<Integer, Integer>> pos, Group group) {
         pos.forEach((c) -> {
-            Circle circle = new Circle(55, grid.getPiece(c.getKey(), c.getValue()).getIsRed() ? Color.PINK : Color.ORANGE);
-            circle.setCenterX(c.getKey());
-            circle.setCenterY(c.getValue());
-            pieces.add(circle);
+            double x = (c.getKey() * width/7) + width/14 + xOffset;
+            double y = (( 5 - c.getValue()) * height/6) + height/12 + yOffset;
+            Circle circle = new Circle(51, grid.getPiece(c.getKey(), c.getValue()).getIsRed() ? Color.PINK : Color.ORANGE);
+            circle.setCenterX(x);
+            circle.setCenterY(y);
+            group.getChildren().add(circle);
         });
+        
     }
     
+    
     public void getMousePos(Scene scene, Group group, int[] piecesInColumn,  double xOffset, double yOffset){
+        this.xOffset = xOffset;
+        this.yOffset = yOffset;
         scene.setOnMouseMoved(event -> {
             mouseLocation[0] = event.getSceneX();
             mouseLocation[1] = event.getSceneY();
